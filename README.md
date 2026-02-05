@@ -29,13 +29,13 @@ You need Node.js and ffmpeg installed. The install scripts create a `soundtag` f
 ### macOS / Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jnjbnfdgjnkfdgjkhjfkgjfkgfgdfgf/soundtag/main/install/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/soundtag1/soundtag/main/install/install.sh | bash
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/jnjbnfdgjnkfdgjkhjfkgjfkgfgdfgf/soundtag/main/install/install.ps1 | iex
+irm https://raw.githubusercontent.com/soundtag1/soundtag/main/install/install.ps1 | iex
 ```
 
 Alternatively, download and double‑click `install/install.bat`.
