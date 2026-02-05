@@ -2,7 +2,7 @@
 
 NFC-triggered, multi-device audio playback server — play sounds on multiple phones with a single tag and no apps required.
 
-![NFC demonstration](nfc_black_to_white.gif)
+![NFC demonstration](nfc_final_ripple_demo.gif)
 
 ## Overview
 
