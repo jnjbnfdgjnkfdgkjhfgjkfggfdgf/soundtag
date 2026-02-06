@@ -37,7 +37,6 @@ curl -fsSL https://raw.githubusercontent.com/soundtag1/soundtag/main/install/ins
 RUN COMMANDS 1 BY 1!!!
 
 ```powershell
-cd $env:TEMP
 irm https://raw.githubusercontent.com/soundtag1/soundtag/main/install/install.ps1 -OutFile install.ps1
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
