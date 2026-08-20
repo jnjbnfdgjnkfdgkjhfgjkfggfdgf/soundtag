@@ -93,10 +93,23 @@ app.get("/api/me", (req, res) => {
   res.json({ authed: !!(req.session && req.session.authed), user: req.session?.user || null });
 });
 
+/* Extensionless page routes. */
+app.get("/login", (req, res) => {
+  // Already signed in? Skip the form.
+  if (req.session && req.session.authed) return res.redirect("/control");
+  res.sendFile(path.join(publicDir, "login.html"));
+});
+app.get("/listener", (req, res) => {
+  res.sendFile(path.join(publicDir, "listener.html"));
+});
+
 /* Control panel page is gated; everything else in /public is public. */
 app.get(["/control", "/control.html"], requirePage, (req, res) => {
   res.sendFile(path.join(publicDir, "control.html"));
 });
+
+/* Root redirects to the control panel (which bounces to /login if needed). */
+app.get("/", (req, res) => res.redirect("/control"));
 
 app.use(express.static(publicDir, { index: false }));
 
