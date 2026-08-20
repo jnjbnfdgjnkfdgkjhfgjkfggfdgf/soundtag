@@ -1,0 +1,16 @@
+{
+  "name": "soundtag",
+  "version": "1.1.0",
+  "private": true,
+  "description": "NFC-triggered, multi-device audio playback server.",
+  "license": "MIT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "express-session": "^1.19.0",
+    "multer": "^1.4.5-lts.1"
+  }
+}

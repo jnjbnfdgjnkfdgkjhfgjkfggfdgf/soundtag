@@ -79,11 +79,30 @@
       opacity: 0.6;
       margin-top: 6px;
     }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .signout {
+      background: rgba(255,255,255,0.08);
+      color: #f5f5f7;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .signout:hover { background: rgba(255,255,255,0.14); }
   </style>
 </head>
 <body>
 
-  <h1>SoundTag</h1>
+  <div class="topbar">
+    <h1>SoundTag</h1>
+    <button class="signout" id="signoutBtn">Sign out</button>
+  </div>
 
   <div class="card upload">
     <strong>Upload sound</strong>
@@ -106,11 +125,22 @@
   const fileInput = document.getElementById("fileInput");
   const uploadStatus = document.getElementById("uploadStatus");
   const stopBtn = document.getElementById("stopBtn");
+  const signoutBtn = document.getElementById("signoutBtn");
+
+  // If any protected request comes back 401, the session expired — go log in.
+  function checkAuth(res) {
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return false;
+    }
+    return true;
+  }
 
   async function loadFiles() {
     list.textContent = "Loading…";
     try {
       const res = await fetch("/files");
+      if (!checkAuth(res)) return;
       const files = await res.json();
 
       if (!files.length) {
@@ -122,12 +152,16 @@
       files.forEach(name => {
         const div = document.createElement("div");
         div.className = "item";
-        div.innerHTML = `
-          <div class="name">${name}</div>
-          <div class="badge">tap</div>
-        `;
+        // Build nodes with textContent so file names can never inject HTML.
+        const nameEl = document.createElement("div");
+        nameEl.className = "name";
+        nameEl.textContent = name;
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = "tap";
+        div.append(nameEl, badge);
         div.onclick = () => {
-          fetch("/play/" + encodeURIComponent(name), { method: "POST" });
+          fetch("/play/" + encodeURIComponent(name), { method: "POST" }).then(checkAuth);
         };
         list.appendChild(div);
       });
@@ -146,6 +180,7 @@
 
     try {
       const res = await fetch("/upload", { method: "POST", body: data });
+      if (!checkAuth(res)) return;
       if (!res.ok) throw new Error();
       uploadStatus.textContent = "Uploaded";
       fileInput.value = "";
@@ -157,8 +192,14 @@
 
   stopBtn.onclick = async () => {
     stopBtn.disabled = true;
-    await fetch("/stop", { method: "POST" });
+    const res = await fetch("/stop", { method: "POST" });
+    checkAuth(res);
     setTimeout(() => stopBtn.disabled = false, 400);
+  };
+
+  signoutBtn.onclick = async () => {
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/login";
   };
 
   loadFiles();
