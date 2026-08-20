@@ -4,285 +4,244 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SoundTag — one tag, every phone</title>
-  <meta name="description" content="SoundTag turns a single NFC tag into a room full of speakers. Tap it with any phone to join a shared audio stream you run from one panel. No apps." />
+  <meta name="description" content="Tap one NFC tag and every phone in the room plays the same sound. No apps, no accounts — just a browser and a tag." />
   <meta property="og:title" content="SoundTag" />
-  <meta property="og:description" content="One NFC tag. Every phone in the room plays the same sound. No apps, no accounts." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <meta property="og:description" content="One NFC tag. Every phone in the room plays the same sound. No apps." />
   <style>
     :root {
-      --paper:   #f2ede1;
-      --paper-2: #eae3d2;
-      --ink:     #16140d;
-      --ink-2:   #4c483b;
-      --accent:  #d23b1e;   /* vermillion — deliberately not blue/purple */
-      --line:    rgba(22,20,13,0.16);
-      --line-2:  rgba(22,20,13,0.08);
+      --ink:   #1d1d1f;
+      --bg:    #ffffff;
+      --grey:  #f5f5f7;
+      --muted: #6e6e73;
+      --blue:  #0071e3;
+      --blue-d:#0060c0;
+      --line:  rgba(0,0,0,0.09);
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+              "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
-      margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
-      font-size: 17px;
-      line-height: 1.6;
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: var(--font);
+      font-size: 17px; line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
-    a { color: inherit; }
-    ::selection { background: var(--accent); color: var(--paper); }
+    a { color: var(--blue); text-decoration: none; }
+    a.arrow:hover { text-decoration: underline; }
+    .wrap { width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px; }
+    .wide { max-width: 1120px; }
 
-    .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 28px; }
-    .serif { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; font-weight: 400; }
-    .mono  { font-family: "Space Mono", ui-monospace, Menlo, Consolas, monospace; }
-
-    /* ---------------- top bar ---------------- */
-    header.bar {
-      border-bottom: 1px solid var(--ink);
+    /* ---------------- nav (frosted, sticky) ---------------- */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--line);
     }
-    .bar-inner {
-      display: flex; align-items: baseline; justify-content: space-between;
-      padding: 18px 0;
-    }
-    .wordmark { font-family: "Instrument Serif", Georgia, serif; font-size: 1.9rem; letter-spacing: -0.01em; }
-    .wordmark b { color: var(--accent); font-weight: 400; }
-    nav.top { display: flex; gap: 26px; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    nav.top a { text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent; transition: border-color .15s; }
-    nav.top a:hover { border-color: var(--ink); }
-    @media (max-width: 640px) { nav.top { display: none; } }
+    .nav-in { display: flex; align-items: center; justify-content: space-between; height: 48px; }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 1.05rem; color: var(--ink); letter-spacing: -0.01em; }
+    .brand .eq { display: inline-flex; gap: 2.5px; align-items: flex-end; height: 15px; }
+    .brand .eq i { width: 2.5px; background: var(--ink); border-radius: 2px; animation: eq 1.1s ease-in-out infinite; }
+    .brand .eq i:nth-child(1){ height: 45%; } .brand .eq i:nth-child(2){ height: 100%; animation-delay:.2s; } .brand .eq i:nth-child(3){ height: 65%; animation-delay:.4s; }
+    @keyframes eq { 0%,100%{ transform: scaleY(.45); } 50%{ transform: scaleY(1); } }
+    .nav-links { display: flex; gap: 26px; align-items: center; font-size: 0.86rem; }
+    .nav-links a { color: var(--ink); opacity: .85; }
+    .nav-links a:hover { opacity: 1; }
+    @media (max-width: 600px){ .nav-links a.hide-sm { display: none; } }
 
     /* ---------------- hero ---------------- */
-    .hero {
-      display: grid;
-      grid-template-columns: 1.35fr 1fr;
-      gap: 20px;
-      align-items: end;
-      padding: 70px 0 48px;
-      border-bottom: 1px solid var(--ink);
+    .hero { text-align: center; padding: 88px 0 20px; }
+    .eyebrow { color: var(--blue); font-size: 1.25rem; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+    h1 {
+      font-weight: 700; letter-spacing: -0.035em; margin: 0;
+      font-size: clamp(2.9rem, 8vw, 5.4rem); line-height: 1.03;
     }
-    @media (max-width: 860px) { .hero { grid-template-columns: 1fr; gap: 40px; } }
+    .subhead {
+      font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 500; letter-spacing: -0.01em;
+      color: var(--ink); max-width: 30ch; margin: 20px auto 8px; line-height: 1.25;
+    }
+    .hero .lede { color: var(--muted); font-size: 1.1rem; max-width: 44ch; margin: 16px auto 26px; }
+    .links-row { display: flex; gap: 26px; justify-content: center; align-items: center; flex-wrap: wrap; font-size: 1.05rem; }
+    .pillbtn {
+      background: var(--blue); color: #fff; font-weight: 500;
+      padding: 12px 24px; border-radius: 980px; font-size: 1.02rem;
+      transition: background .15s;
+    }
+    .pillbtn:hover { background: var(--blue-d); }
+    a.arrow { font-weight: 400; }
+    a.arrow::after { content: " ›"; }
 
-    .kicker {
-      font-family: "Space Mono", monospace;
-      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 22px;
+    /* hero product visual */
+    .stage { position: relative; height: 300px; margin: 46px auto 0; }
+    .ring { position: absolute; top: 50%; left: 50%; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.14); animation: rip 3.4s ease-out infinite; }
+    .ring:nth-child(2){ animation-delay: 1.13s; } .ring:nth-child(3){ animation-delay: 2.26s; }
+    @keyframes rip { 0%{ transform: scale(1); opacity: .8; } 100%{ transform: scale(3.4); opacity: 0; } }
+    .device {
+      position: absolute; top: 50%; left: 50%; width: 108px; height: 108px; margin: -54px 0 0 -54px;
+      border-radius: 26px; background: #fff; border: 1px solid var(--line);
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.05);
+      display: flex; align-items: center; justify-content: center; z-index: 2;
     }
-    h1.title {
-      font-family: "Instrument Serif", Georgia, serif;
-      font-weight: 400;
-      font-size: clamp(3.2rem, 9vw, 6.4rem);
-      line-height: 0.92;
-      letter-spacing: -0.015em;
-      margin: 0;
-    }
-    h1.title em { font-style: italic; color: var(--accent); }
-    .deck {
-      font-size: 1.12rem; color: var(--ink-2); max-width: 40ch;
-      margin: 26px 0 30px;
-    }
-    .actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-    .btn {
-      font-family: "Space Mono", monospace;
-      font-size: 0.82rem; letter-spacing: 0.04em;
-      text-decoration: none; padding: 13px 22px;
-      border: 1px solid var(--ink); border-radius: 2px;
-      transition: background .15s, color .15s, transform .05s;
-    }
-    .btn.solid { background: var(--ink); color: var(--paper); }
-    .btn.solid:hover { background: var(--accent); border-color: var(--accent); }
-    .btn.line:hover { background: var(--ink); color: var(--paper); }
-    .btn:active { transform: translateY(1px); }
+    .device svg { width: 50px; height: 50px; }
+    .dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); opacity: .25; animation: blink 3.4s ease-in-out infinite; }
+    .dot.a{ top: 24%; left: 26%; } .dot.b{ top: 68%; left: 33%; animation-delay:.7s; }
+    .dot.c{ top: 28%; right: 27%; animation-delay:.4s; } .dot.d{ top: 70%; right: 24%; animation-delay:1s; }
+    @keyframes blink { 0%,100%{ opacity:.2; } 50%{ opacity:.9; } }
+    @media (prefers-reduced-motion: reduce){ .ring,.dot,.brand .eq i{ animation:none; } }
 
-    /* tactile tag + concentric line ripples (no gradient blobs) */
-    .diagram { position: relative; height: 300px; display: flex; align-items: center; justify-content: center; }
-    .rings { position: absolute; inset: 0; }
-    .rings span {
-      position: absolute; top: 50%; left: 50%;
-      width: 90px; height: 90px; margin: -45px 0 0 -45px;
-      border: 1px solid var(--ink); border-radius: 50%;
-      opacity: 0;
-      animation: ping 3.6s cubic-bezier(.2,.6,.3,1) infinite;
-    }
-    .rings span:nth-child(2) { animation-delay: 1.2s; }
-    .rings span:nth-child(3) { animation-delay: 2.4s; }
-    @keyframes ping { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(3.1); opacity: 0; } }
-    .tagcard {
-      position: relative; z-index: 2;
-      width: 118px; height: 118px; border-radius: 8px;
-      background: var(--paper); border: 1px solid var(--ink);
-      box-shadow: 6px 6px 0 var(--ink);
-      display: flex; align-items: center; justify-content: center;
-      transform: rotate(-4deg);
-    }
-    .tagcard svg { width: 52px; height: 52px; }
-    .chip { position: absolute; z-index: 3; font-family: "Space Mono", monospace; font-size: 0.66rem; letter-spacing: .1em; text-transform: uppercase; background: var(--accent); color: var(--paper); padding: 3px 8px; border-radius: 2px; }
-    .chip.tap  { top: 30px; right: 40px; transform: rotate(5deg); }
-    .chip.play { bottom: 40px; left: 34px; transform: rotate(-6deg); }
+    /* ---------------- sections ---------------- */
+    section { padding: 90px 0; }
+    .grey { background: var(--grey); }
+    .center { text-align: center; }
+    h2 { font-weight: 700; letter-spacing: -0.03em; font-size: clamp(2rem, 5vw, 3.3rem); line-height: 1.05; margin: 0 0 16px; }
+    .lead { color: var(--muted); font-size: 1.2rem; max-width: 40ch; margin: 0 auto; font-weight: 400; }
+    .lead a { font-weight: 400; }
 
-    @media (prefers-reduced-motion: reduce) { .rings span { animation: none; } }
+    /* bento grid */
+    .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 48px; }
+    .tile { background: #fff; border: 1px solid var(--line); border-radius: 26px; padding: 34px; display: flex; flex-direction: column; justify-content: flex-end; min-height: 220px; }
+    .grey .tile { background: #fff; }
+    .tile .k { font-size: 0.82rem; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--muted); margin-bottom: auto; }
+    .tile h3 { font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em; margin: 18px 0 8px; }
+    .tile p { margin: 0; color: var(--muted); font-size: 1rem; }
+    .tile.dark { background: var(--ink); }
+    .tile.dark h3 { color: #fff; } .tile.dark p { color: #a1a1a6; } .tile.dark .k { color: #86868b; }
+    .tile.blue { background: var(--blue); } .tile.blue h3, .tile.blue p, .tile.blue .k { color: #fff; } .tile.blue p { opacity: .92; }
+    .t6 { grid-column: span 6; } .t3 { grid-column: span 3; } .t2 { grid-column: span 2; }
+    @media (max-width: 780px){ .bento { grid-template-columns: 1fr; } .t6,.t3,.t2 { grid-column: auto; } .tile { min-height: 0; } }
 
-    /* ---------------- section scaffolding ---------------- */
-    section { padding: 64px 0; border-bottom: 1px solid var(--ink); }
-    .sec-head { display: flex; gap: 20px; align-items: baseline; margin-bottom: 8px; }
-    .sec-no { font-family: "Space Mono", monospace; font-size: 0.8rem; color: var(--accent); }
-    h2 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.02; margin: 0; letter-spacing: -0.01em; }
-    .prose { max-width: 62ch; font-size: 1.12rem; color: var(--ink-2); }
-    .prose strong { color: var(--ink); font-weight: 600; }
-
-    /* numbered feature list — not an icon-card grid */
-    .rows { margin-top: 40px; border-top: 1px solid var(--line); }
-    .row {
-      display: grid; grid-template-columns: 64px 1fr; gap: 22px;
-      padding: 22px 0; border-bottom: 1px solid var(--line);
-      align-items: start;
-    }
-    .row .num { font-family: "Space Mono", monospace; font-size: 0.85rem; color: var(--accent); padding-top: 4px; }
-    .row h3 { margin: 0 0 4px; font-size: 1.15rem; font-weight: 600; }
-    .row p { margin: 0; color: var(--ink-2); font-size: 0.98rem; max-width: 56ch; }
-    @media (min-width: 780px) {
-      .rows { display: grid; grid-template-columns: 1fr 1fr; column-gap: 48px; border-top: none; }
-      .rows { border-top: 1px solid var(--line); }
-      .row { border-bottom: 1px solid var(--line); }
-    }
-
-    /* ---------------- install ---------------- */
-    .tabs { display: inline-flex; margin: 30px 0 24px; border: 1px solid var(--ink); border-radius: 3px; overflow: hidden; }
-    .tab {
-      font-family: "Space Mono", monospace; font-size: 0.78rem;
-      padding: 9px 16px; cursor: pointer; background: transparent; color: var(--ink);
-      border-right: 1px solid var(--ink);
-    }
-    .tab:last-child { border-right: none; }
-    .tab.active { background: var(--ink); color: var(--paper); }
-    .panel { display: none; }
+    /* install */
+    .seg { display: inline-flex; background: rgba(0,0,0,0.05); border-radius: 980px; padding: 4px; gap: 3px; margin: 34px 0 26px; }
+    .seg .s { padding: 8px 20px; border-radius: 980px; cursor: pointer; font-weight: 500; font-size: 0.92rem; color: var(--ink); }
+    .seg .s.active { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .panel { display: none; text-align: left; max-width: 680px; margin: 0 auto; }
     .panel.active { display: block; }
-    .step { display: grid; grid-template-columns: 30px 1fr; gap: 16px; margin-bottom: 22px; }
-    .step .n { font-family: "Space Mono", monospace; color: var(--accent); padding-top: 3px; }
-    .step strong { display: block; margin-bottom: 4px; }
-    .step p { margin: 0 0 10px; color: var(--ink-2); font-size: 0.98rem; }
-    .code {
-      position: relative; background: var(--ink); color: #f2ede1;
-      border-radius: 4px; padding: 14px 46px 14px 16px;
-      font-family: "Space Mono", monospace; font-size: 0.8rem; line-height: 1.7;
-      overflow-x: auto; white-space: pre;
-    }
-    .code .copy {
-      position: absolute; top: 8px; right: 8px;
-      font-family: "Space Mono", monospace; font-size: 0.66rem;
-      background: rgba(242,237,225,0.14); color: #f2ede1; border: none;
-      border-radius: 3px; padding: 5px 9px; cursor: pointer;
-    }
-    .code .copy:hover { background: var(--accent); }
-    code.inline { font-family: "Space Mono", monospace; font-size: 0.82em; background: var(--paper-2); padding: 1px 6px; border-radius: 3px; }
+    .step { display: grid; grid-template-columns: 30px 1fr; gap: 16px; margin-bottom: 24px; }
+    .step .n { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .82rem; font-weight: 600; }
+    .step strong { display: block; margin-bottom: 4px; font-weight: 600; }
+    .step p { margin: 0 0 10px; color: var(--muted); font-size: 0.98rem; }
+    .code { position: relative; background: var(--ink); color: #f5f5f7; border-radius: 16px; padding: 15px 48px 15px 18px; font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.83rem; line-height: 1.7; overflow-x: auto; white-space: pre; }
+    .code .copy { position: absolute; top: 9px; right: 9px; background: rgba(255,255,255,0.12); color: #f5f5f7; border: none; border-radius: 8px; padding: 5px 10px; font-size: 0.72rem; cursor: pointer; font-weight: 500; }
+    .code .copy:hover { background: var(--blue); }
+    code.inline { font-family: "SF Mono", ui-monospace, monospace; font-size: 0.85em; background: rgba(0,0,0,0.06); padding: 2px 7px; border-radius: 6px; }
+    .limits { max-width: 680px; margin: 34px auto 0; background: var(--grey); border-radius: 20px; padding: 26px 28px; text-align: left; }
+    .limits h3 { margin: 0 0 10px; font-size: 1.05rem; font-weight: 600; }
+    .limits p { margin: 0 0 8px; color: var(--muted); font-size: 0.98rem; }
+    .limits p:last-child { margin: 0; }
 
-    .limits { margin-top: 34px; padding: 22px 24px; border: 1px solid var(--ink); border-radius: 4px; background: var(--paper-2); }
-    .limits h3 { margin: 0 0 10px; font-family: "Space Mono", monospace; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    .limits p { margin: 0 0 8px; color: var(--ink-2); font-size: 0.98rem; }
-    .limits p:last-child { margin-bottom: 0; }
+    /* footer */
+    footer { background: var(--grey); border-top: 1px solid var(--line); padding: 26px 0 40px; }
+    .foot-links { font-size: 0.82rem; color: var(--muted); padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .foot-links a { color: var(--muted); }
+    .foot-links a:hover { color: var(--ink); }
+    .copy-line { font-size: 0.78rem; color: var(--muted); padding-top: 16px; }
 
-    /* reveal */
-    .rev { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    .rev { opacity: 0; transform: translateY(20px); transition: opacity .8s ease, transform .8s ease; }
     .rev.in { opacity: 1; transform: none; }
-    @media (prefers-reduced-motion: reduce) { .rev { opacity: 1; transform: none; } }
-
-    footer { padding: 40px 0 60px; }
-    .foot-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-family: "Space Mono", monospace; font-size: 0.76rem; color: var(--ink-2); }
-    .foot-inner a { text-decoration: none; border-bottom: 1px solid var(--line); }
-    .foot-inner a:hover { border-color: var(--ink); }
+    @media (prefers-reduced-motion: reduce){ .rev { opacity:1; transform:none; } }
   </style>
 </head>
 <body>
 
-  <header class="bar">
-    <div class="wrap bar-inner">
-      <div class="wordmark">Sound<b>Tag</b></div>
-      <nav class="top">
-        <a href="#what">What</a>
-        <a href="#features">Why</a>
-        <a href="#install">Install</a>
+  <div class="nav">
+    <div class="wrap wide nav-in">
+      <div class="brand"><span class="eq"><i></i><i></i><i></i></span> SoundTag</div>
+      <div class="nav-links">
+        <a class="hide-sm" href="#features">Features</a>
+        <a class="hide-sm" href="#install">Install</a>
         <a href="https://github.com/soundtag1/soundtag">GitHub</a>
-      </nav>
+      </div>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">SoundTag</p>
+      <h1>One tag.<br />The whole room plays.</h1>
+      <p class="subhead">Tap a single NFC tag. Every phone plays the same sound.</p>
+      <p class="lede">No apps, no accounts, no store review — just a browser and a tag, controlled from one simple panel.</p>
+      <div class="links-row">
+        <a class="pillbtn" href="#install">Get started</a>
+        <a class="arrow" href="https://github.com/soundtag1/soundtag">View on GitHub</a>
+      </div>
+
+      <div class="stage" aria-hidden="true">
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+        <span class="dot a"></span><span class="dot b"></span><span class="dot c"></span><span class="dot d"></span>
+        <div class="device">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="1.6" stroke-linecap="round">
+            <path d="M6 8.5a8 8 0 0 1 0 7"/><path d="M9.5 6a13 13 0 0 1 0 12"/><path d="M13 4a18 18 0 0 1 0 16"/>
+            <circle cx="18" cy="12" r="1.3" fill="#0071e3" stroke="none"/>
+          </svg>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="wrap">
-    <section class="hero" style="border-bottom:1px solid var(--ink)">
-      <div>
-        <div class="kicker">NFC · multi-device audio · no apps</div>
-        <h1 class="title">One tag.<br />The whole room <em>plays.</em></h1>
-        <p class="deck">Tap a single NFC tag with any phone. It joins a shared audio stream you run from one small control panel — every device, the same sound, at the same moment.</p>
-        <div class="actions">
-          <a class="btn solid" href="#install">Read the install guide</a>
-          <a class="btn line" href="https://github.com/soundtag1/soundtag">View source →</a>
-        </div>
+  <!-- FEATURES: bento -->
+  <section id="features" class="grey">
+    <div class="wrap wide">
+      <div class="center rev">
+        <h2>Designed to just work.</h2>
+        <p class="lead">Everyone hears the same thing, the moment you tap play.</p>
       </div>
 
-      <div class="diagram" aria-hidden="true">
-        <div class="rings"><span></span><span></span><span></span></div>
-        <span class="chip tap">tap once</span>
-        <div class="tagcard">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#16140d" stroke-width="1.4" stroke-linecap="round">
-            <path d="M5 8.5a9 9 0 0 1 0 7" />
-            <path d="M8.6 6a14 14 0 0 1 0 12" />
-            <path d="M12.2 4a19 19 0 0 1 0 16" />
-            <circle cx="18" cy="12" r="1.4" fill="#d23b1e" stroke="none" />
-          </svg>
+      <div class="bento rev">
+        <div class="tile dark t3">
+          <span class="k">No apps</span>
+          <h3>Nothing to install</h3>
+          <p>Standard NFC opens a web page. Guests download nothing and sign up for nothing.</p>
         </div>
-        <span class="chip play">now playing</span>
-      </div>
-    </section>
-  </div>
-
-  <!-- WHAT -->
-  <section id="what">
-    <div class="wrap rev">
-      <div class="sec-head"><span class="sec-no">01</span><h2>What it actually does</h2></div>
-      <p class="prose">Each phone taps the tag — or scans a QR code — and opens a plain listener page. One tap on that page satisfies the browser's audio rules and locks the phone onto a central stream. From a password-protected control panel you <strong>upload sounds, tap a name to broadcast it to every connected phone, or go silent without dropping anyone</strong>. Nothing to install on guests' phones, no accounts, no store review — just a browser and standard NFC.</p>
-    </div>
-  </section>
-
-  <!-- FEATURES as a numbered list -->
-  <section id="features">
-    <div class="wrap rev">
-      <div class="sec-head"><span class="sec-no">02</span><h2>Why people use it</h2></div>
-      <div class="rows">
-        <div class="row"><span class="num">A</span><div><h3>No mobile apps</h3><p>Standard NFC opens a web page. Guests install nothing and hand over nothing.</p></div></div>
-        <div class="row"><span class="num">B</span><div><h3>Every phone, in sync</h3><p>All connected devices pull the same stream and hear the same audio at once.</p></div></div>
-        <div class="row"><span class="num">C</span><div><h3>One small control panel</h3><p>Upload a file, tap its name to play. A local sign-in keeps the panel yours.</p></div></div>
-        <div class="row"><span class="num">D</span><div><h3>Stop means silence</h3><p>Cut the audio to quiet without disconnecting a single listener from the stream.</p></div></div>
-        <div class="row"><span class="num">E</span><div><h3>Runs anywhere</h3><p>iPhone (iOS 13+), Android, Windows, macOS, Linux — anything with a modern browser.</p></div></div>
-        <div class="row"><span class="num">F</span><div><h3>Yours to change</h3><p>MIT-licensed and small enough to read in one sitting. Fork it, host it, bend it.</p></div></div>
+        <div class="tile blue t3">
+          <span class="k">In sync</span>
+          <h3>Every phone, together</h3>
+          <p>All connected devices share one stream and play the same audio at the same moment.</p>
+        </div>
+        <div class="tile t2">
+          <span class="k">Control</span>
+          <h3>One panel</h3>
+          <p>Upload a file, tap to play. A local sign-in keeps it yours.</p>
+        </div>
+        <div class="tile t2">
+          <span class="k">Silence</span>
+          <h3>Stop, don't drop</h3>
+          <p>Go quiet without disconnecting a single listener.</p>
+        </div>
+        <div class="tile t2">
+          <span class="k">Everywhere</span>
+          <h3>Any device</h3>
+          <p>iPhone, Android, Windows, macOS, Linux — any modern browser.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- INSTALL -->
   <section id="install">
-    <div class="wrap rev">
-      <div class="sec-head"><span class="sec-no">03</span><h2>Get it running</h2></div>
-      <p class="prose">You'll need <strong>Node.js</strong> and <strong>ffmpeg</strong>. The installer drops a <code class="inline">soundtag</code> folder next to you, pulls dependencies, and starts the server on port 3000.</p>
+    <div class="wrap center rev">
+      <h2>Up and running in minutes.</h2>
+      <p class="lead">You'll need <span style="color:var(--ink)">Node.js</span> and <span style="color:var(--ink)">ffmpeg</span>. The installer creates a <code class="inline">soundtag</code> folder, installs everything, and starts on port 3000.</p>
 
-      <div class="tabs" role="tablist">
-        <div class="tab active" data-tab="mac">macOS / Linux</div>
-        <div class="tab" data-tab="win">Windows</div>
-        <div class="tab" data-tab="run">Then</div>
+      <div class="seg" role="tablist">
+        <div class="s active" data-tab="mac">macOS / Linux</div>
+        <div class="s" data-tab="win">Windows</div>
+        <div class="s" data-tab="run">Then</div>
       </div>
 
       <div class="panel active" data-panel="mac">
         <div class="step"><span class="n">1</span><div>
           <strong>Run the installer</strong>
-          <p>Paste into a terminal. It downloads SoundTag, installs deps, and launches it.</p>
-          <div class="code">curl -fsSL https://raw.githubusercontent.com/soundtag1/soundtag/main/install/install.sh | bash<button class="copy">copy</button></div>
+          <p>Paste into a terminal — it downloads SoundTag, installs deps and launches it.</p>
+          <div class="code">curl -fsSL https://raw.githubusercontent.com/soundtag1/soundtag/main/install/install.sh | bash<button class="copy">Copy</button></div>
         </div></div>
         <div class="step"><span class="n">2</span><div>
-          <strong>Pick your own login</strong>
-          <p>Set credentials before starting. Skip this and a random password prints to the console on first run.</p>
+          <strong>Set your own login</strong>
+          <p>Pick credentials before starting. Skip it and a random password prints on first run.</p>
           <div class="code">export SOUNDTAG_USER=admin
-export SOUNDTAG_PASS=your-secret-password<button class="copy">copy</button></div>
+export SOUNDTAG_PASS=your-secret-password<button class="copy">Copy</button></div>
         </div></div>
       </div>
 
@@ -290,62 +249,77 @@ export SOUNDTAG_PASS=your-secret-password<button class="copy">copy</button></div
         <div class="step"><span class="n">1</span><div>
           <strong>PowerShell, one line at a time</strong>
           <div class="code">irm https://raw.githubusercontent.com/soundtag1/soundtag/main/install/install.ps1 -OutFile install.ps1
-powershell -ExecutionPolicy Bypass -File .\install.ps1<button class="copy">copy</button></div>
+powershell -ExecutionPolicy Bypass -File .\install.ps1<button class="copy">Copy</button></div>
         </div></div>
         <div class="step"><span class="n">2</span><div>
           <strong>Or double-click <code class="inline">install/install.bat</code></strong>
           <p>Prefer a click? Grab the batch file from the repo and run it.</p>
         </div></div>
         <div class="step"><span class="n">3</span><div>
-          <strong>Pick your own login</strong>
+          <strong>Set your own login</strong>
           <div class="code">setx SOUNDTAG_USER admin
-setx SOUNDTAG_PASS your-secret-password<button class="copy">copy</button></div>
+setx SOUNDTAG_PASS your-secret-password<button class="copy">Copy</button></div>
         </div></div>
       </div>
 
       <div class="panel" data-panel="run">
         <div class="step"><span class="n">1</span><div>
           <strong>Expose port 3000</strong>
-          <p>Share your machine's IP on the local network, or port-forward / tunnel (e.g. playit.gg) for the open internet.</p>
+          <p>Share your machine's IP on the network, or port-forward / tunnel (e.g. playit.gg) for the open internet.</p>
         </div></div>
         <div class="step"><span class="n">2</span><div>
-          <strong>Point the NFC tag at the listener</strong>
-          <p>Program the tag (or a QR code) to open the blank listener page. One tap there unlocks audio.</p>
-          <div class="code">https://your-public-url/listener<button class="copy">copy</button></div>
+          <strong>Point the tag at the listener</strong>
+          <p>Program the NFC tag (or a QR code) to open the blank listener page. One tap unlocks audio.</p>
+          <div class="code">https://your-public-url/listener<button class="copy">Copy</button></div>
         </div></div>
         <div class="step"><span class="n">3</span><div>
           <strong>Open the panel and sign in</strong>
           <p>Upload <code class="inline">.mp3 / .wav / .ogg / .m4a</code>, then tap a name to send it to every phone.</p>
-          <div class="code">https://your-public-url/control<button class="copy">copy</button></div>
+          <div class="code">https://your-public-url/control<button class="copy">Copy</button></div>
         </div></div>
       </div>
 
       <div class="limits">
         <h3>What it can't do (on purpose)</h3>
-        <p>— It can't raise system volume, override silent/mute mode, or play before a tap. Those are iOS/Android rules, not missing features.</p>
-        <p>— Close the listener page and that phone stops. It isn't a background app.</p>
+        <p>It can't raise system volume, override silent/mute mode, or play before a tap — those are iOS/Android rules, not missing features.</p>
+        <p>Close the listener page and that phone stops. It isn't a background app.</p>
       </div>
     </div>
   </section>
 
-  <div class="wrap">
-    <footer>
-      <div class="foot-inner">
-        <span>SoundTag — MIT licensed — © <span id="year"></span></span>
-        <span><a href="https://github.com/soundtag1/soundtag">Repository</a> &nbsp;·&nbsp; <a href="https://github.com/soundtag1/soundtag#readme">Readme</a> &nbsp;·&nbsp; <a href="https://github.com/soundtag1/soundtag/releases">Releases</a></span>
+  <!-- FINAL -->
+  <section class="grey center">
+    <div class="wrap rev">
+      <h2>Bring a room to life<br />with one tap.</h2>
+      <p class="lead" style="margin-bottom:30px">Free, open source, running in a couple of minutes.</p>
+      <div class="links-row">
+        <a class="pillbtn" href="#install">Get started</a>
+        <a class="arrow" href="https://github.com/soundtag1/soundtag/releases">Download v1.1.0</a>
       </div>
-    </footer>
-  </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap wide">
+      <div class="foot-links">
+        <a href="https://github.com/soundtag1/soundtag">GitHub</a> &nbsp;·&nbsp;
+        <a href="https://github.com/soundtag1/soundtag#readme">Documentation</a> &nbsp;·&nbsp;
+        <a href="https://github.com/soundtag1/soundtag/releases">Releases</a> &nbsp;·&nbsp;
+        <a href="https://github.com/soundtag1/soundtag/blob/main/LICENSE">License</a>
+      </div>
+      <div class="copy-line">SoundTag is open source under the MIT License. © <span id="year"></span> SoundTag.</div>
+    </div>
+  </footer>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const tabs = document.querySelectorAll(".tab");
-    tabs.forEach((t) => t.addEventListener("click", () => {
-      tabs.forEach((x) => x.classList.remove("active"));
-      t.classList.add("active");
+    const segs = document.querySelectorAll(".seg .s");
+    segs.forEach((s) => s.addEventListener("click", () => {
+      segs.forEach((x) => x.classList.remove("active"));
+      s.classList.add("active");
       document.querySelectorAll(".panel").forEach((p) =>
-        p.classList.toggle("active", p.dataset.panel === t.dataset.tab));
+        p.classList.toggle("active", p.dataset.panel === s.dataset.tab));
     }));
 
     document.querySelectorAll(".code .copy").forEach((btn) => {
@@ -353,14 +327,14 @@ setx SOUNDTAG_PASS your-secret-password<button class="copy">copy</button></div>
         const node = btn.parentElement.cloneNode(true);
         node.querySelector(".copy").remove();
         navigator.clipboard.writeText(node.textContent.trim()).then(() => {
-          const t = btn.textContent; btn.textContent = "copied"; setTimeout(() => (btn.textContent = t), 1300);
+          const t = btn.textContent; btn.textContent = "Copied"; setTimeout(() => (btn.textContent = t), 1300);
         }).catch(() => {});
       });
     });
 
     const io = new IntersectionObserver((es) => {
       es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.1 });
     document.querySelectorAll(".rev").forEach((el) => io.observe(el));
   </script>
 </body>
