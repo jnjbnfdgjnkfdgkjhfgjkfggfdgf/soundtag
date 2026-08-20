@@ -97,6 +97,10 @@ sessions last 12 hours and you can sign out from the panel.
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+## Contributors
+
+See [CONTRIBUTORS.md](CONTRIBUTORS.md). Built with [Claude Code](https://claude.com/claude-code).
+
 ## License
 
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
