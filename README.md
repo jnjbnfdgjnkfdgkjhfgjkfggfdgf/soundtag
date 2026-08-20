@@ -2,7 +2,17 @@
 
 NFC-triggered, multi-device audio playback server — play sounds on multiple phones with a single tag and no apps required.
 
+[![Downloads](https://img.shields.io/github/downloads/soundtag1/soundtag/total?label=downloads&color=2f80ff)](https://github.com/soundtag1/soundtag/releases)
+[![Latest release](https://img.shields.io/github/v/release/soundtag1/soundtag?color=7a5cff)](https://github.com/soundtag1/soundtag/releases)
+[![Stars](https://img.shields.io/github/stars/soundtag1/soundtag?style=flat&color=ffb020)](https://github.com/soundtag1/soundtag/stargazers)
+![Visitors](https://komarev.com/ghpvc/?username=soundtag1-soundtag&label=visitors&color=00c8b4)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+**🌐 Website & install guide:** https://soundtag1.github.io/soundtag/
+
 ![NFC demonstration](nfc_final_ripple_demo.gif)
+
+> The **downloads** badge counts downloads of files attached to [GitHub Releases](https://github.com/soundtag1/soundtag/releases). Cut a release (and attach an asset, e.g. a zip of the app) for it to climb.
 
 ## Overview
 
@@ -43,6 +53,23 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 Alternatively, download and double‑click `install/install.bat`.
 
+## Authentication (control panel)
+
+The control panel is protected by a local sign-in page. Listeners (`/listener`)
+and the audio stream stay public so phones can join without a login.
+
+Set your credentials with environment variables before starting the server:
+
+```bash
+export SOUNDTAG_USER=admin
+export SOUNDTAG_PASS=your-secret-password
+# optional: export SESSION_SECRET=a-long-random-string
+```
+
+If `SOUNDTAG_PASS` is not set, a random password is generated and printed to the
+console on startup. Visiting `/control` redirects to `/login` until you sign in;
+sessions last 12 hours and you can sign out from the panel.
+
 ## Using SoundTag
 
 1. Install and run the server using the commands above.
@@ -61,7 +88,7 @@ Alternatively, download and double‑click `install/install.bat`.
    https://your-public-url/control
    ```
 
-   Upload one or more `.mp3`, `.wav`, `.ogg` or `.m4a` files. Each file appears as a tappable row.
+   Sign in with your `SOUNDTAG_USER` / `SOUNDTAG_PASS` credentials, then upload one or more `.mp3`, `.wav`, `.ogg` or `.m4a` files. Each file appears as a tappable row.
 
 5. Tap a file name in the control panel to broadcast it to all connected phones.
 6. Press **Stop (Silent)** to make the audio stream go silent while keeping listeners connected.
